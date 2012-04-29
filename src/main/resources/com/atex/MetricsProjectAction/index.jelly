@@ -1,0 +1,15 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	
+	<l:layout xmlns:g="/hudson/plugins/grinder/tags">
+		<st:include it="${it.project}" page="sidepanel.jelly" />
+		<l:main-panel>
+	      <h1>Metrics Project Report</h1>
+
+	      <div style="width: 800px; margin-left: auto; margin-right: auto;">
+	         <img src="metricsAccumulatedGraph" height="150" width="800"/>
+         </div>
+
+      </l:main-panel>
+	</l:layout>
+</j:jelly>
