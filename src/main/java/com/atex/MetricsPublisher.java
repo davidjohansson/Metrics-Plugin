@@ -13,8 +13,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -32,10 +30,14 @@ public class MetricsPublisher extends Recorder {
 
 	private final static Logger LOG = Logger.getLogger(com.atex.MetricsPublisher.class.getName());
    private String name;
+	private final String wsURI;
+	private final String authStr;
 
    @DataBoundConstructor
-   public MetricsPublisher(String name) {
+   public MetricsPublisher(String name, String wsURI, String authStr) {
       this.name = name;
+	this.wsURI = wsURI;
+	this.authStr = authStr;
    }
 
    public String getName() {
@@ -45,7 +47,6 @@ public class MetricsPublisher extends Recorder {
    @Override
    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
-
       PrintStream logger = listener.getLogger();
       
       //if (build.getWorkspace().child(name).exists()) {
@@ -57,7 +58,7 @@ public class MetricsPublisher extends Recorder {
      
       InputStream is = metricsUrl.openStream();
       try {
-            build.addAction(new MetricsBuildAction(build, is, logger));
+            build.addAction(new MetricsBuildAction(build, is, logger, wsURI, authStr));
          } catch (MetricsParseException gpe) {
             LOG.log(Level.WARNING, "Failed to parse metrics data", gpe);
             build.setResult(Result.FAILURE);

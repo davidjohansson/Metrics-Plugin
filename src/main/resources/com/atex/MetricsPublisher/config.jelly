@@ -6,4 +6,19 @@
     -->
     <f:textbox field="name" />
 	</f:entry>
+	<f:entry title="Polopoly Webservice URI" help="http://domain/polopoly/ws">
+    <!--
+      Creates an text field that shows the value of the "name" property.
+      When submitted, it will be passed to the corresponding constructor parameter.
+    -->
+    <f:textbox field="wsURI" />
+    </f:entry>
+    <f:entry title="Polopoly Webservice credentials" help="username:password">
+    <!--
+      Creates an text field that shows the value of the "name" property.
+      When submitted, it will be passed to the corresponding constructor parameter.
+    -->
+    <f:textbox field="authStr" />
+    </f:entry>
+
 </j:jelly>
