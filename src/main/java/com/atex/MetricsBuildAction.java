@@ -15,10 +15,9 @@ public class MetricsBuildAction extends AbstractMetricsAction {
 	private List<MetricsData> metricsList;
 
 	public MetricsBuildAction(AbstractBuild<?, ?> build, InputStream is,
-			PrintStream logger) {
+			PrintStream logger, String wsURI, String authStr) {
 		this.build = build;
-		
-		MetricsReader reader = new MetricsReader(is, build.getNumber());
+		MetricsReader reader = new MetricsReader(is, build.getNumber(), wsURI, authStr);
 		metricsList = reader.getMetricsList();
 
 		logger.println("Created Metrics results");
