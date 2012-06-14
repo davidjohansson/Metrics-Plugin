@@ -4,14 +4,23 @@ import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
 import hudson.util.ChartUtil;
+import hudson.util.ShiftedCategoryAxis;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Iterator;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.ColorPalette;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -93,19 +102,24 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		
 		DefaultXYDataset dataSet = new DefaultXYDataset();
 
+		
 		while(dataSetIter.hasNext()){
 			MetricsDataSet metricsDataSet = dataSetIter.next();
 			metricsDataSet.getBuildKeys();
 			dataSet.addSeries(metricsDataSet.getKey(), new double[][]{metricsDataSet.getTotalTimes(), getBuildKeysDouble(metricsDataSet)} );
+		
 		}
 
 		JFreeChart chart = ChartFactory.createXYLineChart("Accumulated metrics data", "Rendering time (ms)", "Build id", dataSet, PlotOrientation.HORIZONTAL, true, true, true);
 
+
+	
+		/*
 		
-		/*		
 		JFreeChart chart = ChartFactory.createStackedAreaChart(valueName
 				+ " Trend", "Build", unitName, builder.build(),
 				PlotOrientation.VERTICAL, false, false, false);
+
 
 		chart.setBackgroundPaint(Color.WHITE);
 
@@ -127,14 +141,13 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		renderer.setSeriesPaint(2, ColorPalette.RED);
 		renderer.setSeriesPaint(1, ColorPalette.YELLOW);
 		renderer.setSeriesPaint(0, ColorPalette.BLUE);
-
 		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
 		// crop extra space around the graph
 		plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
-		*/
-
+		
+*/
 		return chart;
 	}
 
