@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.Describable;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -83,6 +84,14 @@ public class MetricsPublisher extends Recorder {
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
 	}
+
+	
+	@Override
+	public BuildStepDescriptor getDescriptor() {
+		// TODO Auto-generated method stub
+		return super.getDescriptor();
+	}
+
 
 	@Extension
 	public static final class DescriptorImpl extends

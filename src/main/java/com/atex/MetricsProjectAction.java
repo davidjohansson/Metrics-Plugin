@@ -4,6 +4,8 @@ import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.Project;
 import hudson.util.ChartUtil;
+import hudson.util.ChartUtil.NumberOnlyBuildLabel;
+import hudson.util.DataSetBuilder;
 import hudson.util.ShiftedCategoryAxis;
 
 import java.awt.Color;
@@ -16,10 +18,8 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.ColorPalette;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -32,19 +32,8 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 
 	private final Project<?, ?> project;
 
-	private String imageUrl;
-
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
 	public MetricsProjectAction(Project<?, ?> project) {
 		this.project = project;
-		this.imageUrl = "https://docs.google.com/spreadsheet/oimg?key=0Au2IXSomxct0dHZockc0QTNZTnFMaWMzVklRZHdXbmc&oid=1&zx=32aai2qjgfhw";
 	}
 
 	public Project<?, ?> getProject() {
@@ -56,33 +45,14 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 
 		if (shouldReloadGraph(request, response)) {
 			ChartUtil.generateGraph(request, response,
-					createMeanRespLengthGraph(), 800, 150);
+					createNumberBuildGraph(), 1200, 600);
 		}
 	}
-
-
-	private JFreeChart createMeanRespLengthGraph() {
-		return createNumberBuildGraph("",
-				"Length (bytes)");
-	}
-
-	
-	private double[] getBuildKeysDouble(MetricsDataSet set){
 		
-		String [] keys = set.getBuildKeys();
-		double[] doubles = new double[keys.length];
-
-		for(int i = 0; i < keys.length; i++){
-			doubles[i] = Integer.parseInt(keys[i]);
-		}
+	private JFreeChart createNumberBuildGraph() {
+	      DataSetBuilder<String, NumberOnlyBuildLabel> builder = new DataSetBuilder<String, NumberOnlyBuildLabel>();
 		
-		return doubles;
-	}
-	
-	private JFreeChart createNumberBuildGraph(String valueName, String unitName) {
 
-		MetricsDataSetBuilder builder = new MetricsDataSetBuilder();
-		
 		for (Object build : project.getBuilds()) {
 
 			AbstractBuild abstractBuild = (AbstractBuild) build;
@@ -93,33 +63,17 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 				MetricsBuildAction action = abstractBuild
 						.getAction(MetricsBuildAction.class);
 
-				builder.add(action.getMetricsList().iterator());
+				Iterator<MetricsData> i = action.getMetricsList().iterator();
+				while(i.hasNext())
+				{
+					MetricsData data = i.next();
+					builder.add(new Integer(data.getTotalTime()), data.getKey(), new NumberOnlyBuildLabel(abstractBuild));
+				}
 			}
 		}
 
-
-		Iterator<MetricsDataSet> dataSetIter = builder.metricsDataSetIterator();
-		
-		DefaultXYDataset dataSet = new DefaultXYDataset();
-
-		
-		while(dataSetIter.hasNext()){
-			MetricsDataSet metricsDataSet = dataSetIter.next();
-			metricsDataSet.getBuildKeys();
-			dataSet.addSeries(metricsDataSet.getKey(), new double[][]{metricsDataSet.getTotalTimes(), getBuildKeysDouble(metricsDataSet)} );
-		
-		}
-
-		JFreeChart chart = ChartFactory.createXYLineChart("Accumulated metrics data", "Rendering time (ms)", "Build id", dataSet, PlotOrientation.HORIZONTAL, true, true, true);
-
-
-	
-		/*
-		
-		JFreeChart chart = ChartFactory.createStackedAreaChart(valueName
-				+ " Trend", "Build", unitName, builder.build(),
-				PlotOrientation.VERTICAL, false, false, false);
-
+		JFreeChart chart = ChartFactory.createLineChart("", "Build", "Rendering time (ms)", builder.build(),
+				PlotOrientation.VERTICAL, true, true, true);
 
 		chart.setBackgroundPaint(Color.WHITE);
 
@@ -127,8 +81,7 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		plot.setBackgroundPaint(Color.WHITE);
 		plot.setOutlinePaint(null);
 		plot.setForegroundAlpha(0.8f);
-		plot.setRangeGridlinesVisible(true);
-		plot.setRangeGridlinePaint(Color.black);
+		plot.setRangeGridlinesVisible(false);
 
 		CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
 		plot.setDomainAxis(domainAxis);
@@ -138,16 +91,12 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		domainAxis.setCategoryMargin(0.0);
 
 		CategoryItemRenderer renderer = plot.getRenderer();
-		renderer.setSeriesPaint(2, ColorPalette.RED);
-		renderer.setSeriesPaint(1, ColorPalette.YELLOW);
-		renderer.setSeriesPaint(0, ColorPalette.BLUE);
 		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
 		// crop extra space around the graph
 		plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
-		
-*/
+
 		return chart;
 	}
 
