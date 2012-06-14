@@ -13,8 +13,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -34,10 +32,14 @@ public class MetricsPublisher extends Recorder {
 	private final static Logger LOG = Logger
 			.getLogger(com.atex.MetricsPublisher.class.getName());
 	private String name;
+	private final String wsURI;
+	private final String authStr;
 
 	@DataBoundConstructor
-	public MetricsPublisher(String name) {
+	public MetricsPublisher(String name, String wsURI, String authStr) {
 		this.name = name;
+		this.wsURI = wsURI;
+		this.authStr = authStr;
 	}
 
 	public String getName() {
@@ -51,27 +53,32 @@ public class MetricsPublisher extends Recorder {
 		PrintStream logger = listener.getLogger();
 		InputStream is = null;
 		try {
-			//TODO: can name be made required in the gui?
-			if(! name.endsWith("/")){
+			// TODO: can name be made required in the gui?
+			if (!name.endsWith("/")) {
 				name = name + "/";
 			}
-			URL metricsUrl = new URL(name + 
-					"polopolydevelopment/Metrics?name=_-_-RenderStats__--element__--ownTotal&op=ownTotal&res=hour&fmt=html&asc=false&totalop=ownTotal&col=0");
+			URL metricsUrl = new URL(
+					name
+							+ "polopolydevelopment/Metrics?name=_-_-RenderStats__--element__--ownTotal&op=ownTotal&res=hour&fmt=html&asc=false&totalop=ownTotal&col=0");
 			is = metricsUrl.openStream();
-			build.addAction(new MetricsBuildAction(build, is, logger));
+			build.addAction(new MetricsBuildAction(build, is, logger, wsURI,
+					authStr));
 		} catch (MalformedURLException mue) {
 			build.setResult(Result.FAILURE);
-			throw new IOException("Failed to connect to Metrics servlet using provided host address '" + name + "'", mue);
+			throw new IOException(
+					"Failed to connect to Metrics servlet using provided host address '"
+							+ name + "'", mue);
 		} catch (MetricsParseException gpe) {
 			LOG.log(Level.WARNING, "Failed to parse metrics data", gpe);
 			build.setResult(Result.FAILURE);
 		} finally {
-			if(is != null){
+			if (is != null) {
 				is.close();
 			}
 		}
 
 		return true;
+
 	}
 
 	@Override
