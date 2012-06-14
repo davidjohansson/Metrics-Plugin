@@ -18,6 +18,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -27,6 +30,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class MetricsPublisher extends Recorder {
 
+	private final static Logger LOG = Logger.getLogger(com.atex.MetricsPublisher.class.getName());
    private String name;
 
    @DataBoundConstructor
@@ -47,13 +51,21 @@ public class MetricsPublisher extends Recorder {
       //if (build.getWorkspace().child(name).exists()) {
         // InputStream is = build.getWorkspace().child(name).read();
     	  
-    	  InputStream is = new FileInputStream(new File("/Applications/apache-tomcat-7.0.26/webapps/ROOT/metricsdata.html"));
-         try {
+//    	  InputStream is = new FileInputStream(new File("/Applications/apache-tomcat-7.0.26/webapps/ROOT/metricsdata.html"));
+  
+      URL metricsUrl = new URL("http://localhost:8080/polopolydevelopment/Metrics?name=_-_-RenderStats__--element__--ownTotal&op=ownTotal&res=hour&fmt=html&asc=false&totalop=ownTotal&col=0");
+     
+      InputStream is = metricsUrl.openStream();
+      try {
             build.addAction(new MetricsBuildAction(build, is, logger));
          } catch (MetricsParseException gpe) {
-            logger.println("Failed to parse metrics report");
+            LOG.log(Level.WARNING, "Failed to parse metrics data", gpe);
             build.setResult(Result.FAILURE);
      }
+         finally{
+        	 is.close();
+         }
+         
     //  } else {
       //   logger.println("Grinder out* log file not found!");
        //  build.setResult(Result.FAILURE);
