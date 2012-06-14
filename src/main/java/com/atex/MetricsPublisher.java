@@ -4,7 +4,6 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.model.Describable;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -41,6 +40,14 @@ public class MetricsPublisher extends Recorder {
 		this.name = name;
 		this.wsURI = wsURI;
 		this.authStr = authStr;
+	}
+
+	public String getWsURI() {
+		return wsURI;
+	}
+
+	public String getAuthStr() {
+		return authStr;
 	}
 
 	public String getName() {
