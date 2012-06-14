@@ -84,7 +84,7 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 				MetricsBuildAction action = abstractBuild
 						.getAction(MetricsBuildAction.class);
 
-				builder.add(action.getMetricsIterator());
+				builder.add(action.getMetricsList().iterator());
 			}
 		}
 
@@ -96,13 +96,13 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		while(dataSetIter.hasNext()){
 			MetricsDataSet metricsDataSet = dataSetIter.next();
 			metricsDataSet.getBuildKeys();
-			dataSet.addSeries(metricsDataSet.getKey(), new double[][]{getBuildKeysDouble(metricsDataSet), metricsDataSet.getTotalTimes()} );
+			dataSet.addSeries(metricsDataSet.getKey(), new double[][]{metricsDataSet.getTotalTimes(), getBuildKeysDouble(metricsDataSet)} );
 		}
-		
-		
 
 		JFreeChart chart = ChartFactory.createXYLineChart("Accumulated metrics data", "Rendering time (ms)", "Build id", dataSet, PlotOrientation.HORIZONTAL, true, true, true);
-/*		
+
+		
+		/*		
 		JFreeChart chart = ChartFactory.createStackedAreaChart(valueName
 				+ " Trend", "Build", unitName, builder.build(),
 				PlotOrientation.VERTICAL, false, false, false);

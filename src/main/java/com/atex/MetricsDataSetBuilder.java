@@ -38,7 +38,7 @@ public class MetricsDataSetBuilder {
 				set = new MetricsDataSet(metric.getKey());
 				data.put(metric.getKey(), set);
 			}
-			set.buildKeys.add(metric.getBuild());
+			set.buildKeys.add(Integer.toString(metric.getBuild()));
 			
 			addTotalTime(set, metric.getTotalTime());
 		}

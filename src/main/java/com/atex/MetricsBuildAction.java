@@ -4,7 +4,7 @@ import hudson.model.AbstractBuild;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Action used for Grinder report on build level.
@@ -12,14 +12,14 @@ import java.util.Iterator;
  */
 public class MetricsBuildAction extends AbstractMetricsAction {
 	private final AbstractBuild<?, ?> build;
-	private Iterator<MetricsData> metricsIterator;
+	private List<MetricsData> metricsList;
 
 	public MetricsBuildAction(AbstractBuild<?, ?> build, InputStream is,
 			PrintStream logger) {
 		this.build = build;
 		
-		MetricsReader reader = new MetricsReader(is, build.getId());
-		metricsIterator = reader.getMetricsIterator();
+		MetricsReader reader = new MetricsReader(is, build.getNumber());
+		metricsList = reader.getMetricsList();
 
 		logger.println("Created Metrics results");
 	}
@@ -28,8 +28,8 @@ public class MetricsBuildAction extends AbstractMetricsAction {
 		return build;
 	}
 
-	public Iterator<MetricsData> getMetricsIterator(){
-		return metricsIterator;
+	public List<MetricsData> getMetricsList(){
+		return metricsList;
 	}
 
 }

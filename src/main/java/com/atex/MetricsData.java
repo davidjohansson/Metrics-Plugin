@@ -7,18 +7,18 @@ package com.atex;
 public class MetricsData {
 
 	private String key;
-	private String build;
+	private int build;
 	private int totalTime;
 
 	public String getKey() {
 		return key;
 	}
 
-	public String getBuild() {
+	public int getBuild() {
 		return build;
 	}
 
-	public MetricsData(String key, String build) {
+	public MetricsData(String key, int build) {
 		this.key = key;
 		this.build = build;
 	}

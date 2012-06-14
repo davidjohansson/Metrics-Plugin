@@ -8,7 +8,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import java.io.IOException;
 
 /**
- * Abstract class with functionality common to all Grinder actions.
+ * Abstract class with functionality common to all Metrics actions.
  *
  */
 public class AbstractMetricsAction implements Action {

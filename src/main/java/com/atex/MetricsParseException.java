@@ -1,9 +1,8 @@
 package com.atex;
 
 /**
- * Exception used to show Grinder parsing has failed.
+ * Exception used to show Metrics parsing has failed.
  *
- * @author Eivind B Waaler
  */
 public class MetricsParseException extends RuntimeException {
    public MetricsParseException(String msg, Exception e) {
