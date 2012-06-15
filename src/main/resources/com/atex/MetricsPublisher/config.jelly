@@ -4,7 +4,7 @@
       Creates an text field that shows the value of the "name" property.
       When submitted, it will be passed to the corresponding constructor parameter.
     -->
-    <f:textbox field="name" />
+    <f:textbox field="metricsServletURI" />
 	</f:entry>
 	<f:entry title="Polopoly Webservice URI" help="http://domain/polopoly/ws">
     <!--
