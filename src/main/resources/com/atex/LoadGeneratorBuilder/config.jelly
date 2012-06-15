@@ -1,0 +1,24 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+    This jelly script is used for per-project configuration.
+
+    See global.jelly for a general discussion about jelly script.
+  -->
+
+  <!--
+    Creates a text field that shows the value of the "url" property.
+    When submitted, it will be passed to the corresponding constructor parameter.
+  -->
+  <f:entry title="URL" field="url">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="Number of concurrent threads, defaults to 1" field="threads">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="Number of requests per thread, defaults to 100" field="requests">
+    <f:textbox />
+  </f:entry>
+  <f:entry title="Clear Metrics data before generating load?" field="clearMetrics">
+    <f:checkbox />
+  </f:entry>
+</j:jelly>

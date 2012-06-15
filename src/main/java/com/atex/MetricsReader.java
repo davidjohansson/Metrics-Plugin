@@ -60,6 +60,7 @@ public class MetricsReader {
 
 		InputStream input = connection.getInputStream();
 		Document doc = Jsoup.parse(input, "UTF-8", "");
+		input.close();
 		return doc.getElementsByTag("metadata")
 								 .first()
 								 .getElementsByTag("externalid")

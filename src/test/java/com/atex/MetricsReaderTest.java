@@ -15,11 +15,10 @@ public class MetricsReaderTest {
 
 		MetricsReader reader;
 		try {
-			reader = new MetricsReader(new FileInputStream(new File("src/test/resources/com/atex/test1.html")), 1);
+			reader = new MetricsReader(new FileInputStream(new File("src/test/resources/com/atex/test1.html")), 1, "http://localhost:8080", "credentials");
 			
 			System.out.println(reader);
 			Assert.assertTrue(reader.getMetricsList().size() == 19);
-//			Assert.assertEquals(71, reader.get("15.288").getTotalTime());
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

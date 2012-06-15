@@ -33,6 +33,11 @@
 	  <artifactId>jsoup</artifactId>
 	  <version>1.6.2</version>
 	</dependency>
-  </dependencies>
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpcore-ab</artifactId>
+	    <version>4.2</version>
+	</dependency>
+	</dependencies>
   
 </project>
