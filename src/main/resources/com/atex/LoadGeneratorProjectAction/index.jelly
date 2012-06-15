@@ -1,0 +1,21 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	
+	
+
+	<l:layout xmlns:g="/hudson/plugins/grinder/tags">
+		<st:include it="${it.project}" page="sidepanel.jelly" />
+
+		<l:main-panel>
+	      <h1>Load Test Project Report</h1>
+
+		${it.init()}
+	      <div style="width: 1200px; margin-left: auto; margin-right: auto;">
+	         <img src="loadTestTimePerRequestGraph" height="600" width="1200"/>
+         </div> 
+         <div style="width: 1200px; margin-left: auto; margin-right: auto;">
+             <img src="loadTestRequestsPerSecondGraph" height="600" width="1200"/>
+         </div>        
+      </l:main-panel>
+	</l:layout>
+</j:jelly>

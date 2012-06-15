@@ -1,11 +1,13 @@
 package com.atex;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Cause;
+import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -96,7 +98,7 @@ public class LoadGeneratorBuilder extends Builder {
         
         if(clearMetrics) {
         	MetricsPublisher metricsPublisher = (MetricsPublisher)build.getProject().getPublishersList().get(MetricsPublisher.class);
-        	String metricsURI = metricsPublisher.getName();
+        	String metricsURI = metricsPublisher.getMetricsServletURI();
 
         	clearMetricsData(listener, metricsURI);
         }
@@ -112,6 +114,12 @@ public class LoadGeneratorBuilder extends Builder {
         
         return true;
     }
+    
+	@Override
+	public Action getProjectAction(AbstractProject<?, ?> project) {
+		return project instanceof Project ? new LoadGeneratorProjectAction(
+				(Project) project) : null;
+	}
 
     private void clearMetricsData(BuildListener listener, String metricsURI) {
         HttpClient httpclient = new DefaultHttpClient();
