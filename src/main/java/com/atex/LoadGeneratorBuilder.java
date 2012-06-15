@@ -84,9 +84,7 @@ public class LoadGeneratorBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) {
         // This is where you 'build' the project.
-        // Since this is a dummy, we just say 'hello world' and call that a build.
-
-        List<Cause> buildStepCause = new ArrayList<Cause>();
+    	List<Cause> buildStepCause = new ArrayList<Cause>();
         buildStepCause.add(new Cause() {
           public String getShortDescription() {
             return "Build Step started by the load generator";
@@ -97,37 +95,44 @@ public class LoadGeneratorBuilder extends Builder {
         PrintStream logger = listener.getLogger();
         
         if(clearMetrics) {
-        	clearMetricsData(listener);
+        	MetricsPublisher metricsPublisher = (MetricsPublisher)build.getProject().getPublishersList().get(MetricsPublisher.class);
+        	String metricsURI = metricsPublisher.getName();
+
+        	clearMetricsData(listener, metricsURI);
         }
         
-        generateLoad(logger);
-        listener.finished(Result.SUCCESS);
+        try {
+			String abResult = generateLoad(listener);
+			build.addAction(new LoadGeneratorBuildAction(abResult));
+			listener.finished(Result.SUCCESS);
+		} catch (Exception e) {
+			listener.error("Failed to gererate load, " + e.getMessage());
+			listener.finished(Result.FAILURE);
+		}
         
         return true;
     }
 
-    private void clearMetricsData(BuildListener listener) {
+    private void clearMetricsData(BuildListener listener, String metricsURI) {
         HttpClient httpclient = new DefaultHttpClient();
         PrintStream logger = listener.getLogger();
         try {
-        	String metricsURI = "http://localhost:8080/polopolydevelopment/Metrics";
             HttpGet httpget = new HttpGet(metricsURI + "?mode=clear");
 
-            // Create a response handler
             HttpResponse response = httpclient.execute(httpget);
             if(response.getStatusLine().getStatusCode() == 200) {
             	logger.println("Cleared all metrics data");
             }
             else {
-            	logger.println("Failed to clear metrics data, got response code " + response.getStatusLine().getStatusCode());
+            	listener.error("Failed to clear metrics data, got response code " + response.getStatusLine().getStatusCode());
             	listener.finished(Result.FAILURE);
             }
 
         } catch (ClientProtocolException e) {
-        	logger.println("Failed to clear metrics data, " + e.getMessage());
+        	listener.error("Failed to clear metrics data, " + e.getMessage());
         	listener.finished(Result.FAILURE);
 		} catch (IOException e) {
-			logger.println("Failed to clear metrics data, " + e.getMessage());
+			listener.error("Failed to clear metrics data, " + e.getMessage());
 			listener.finished(Result.FAILURE);
 		} finally {
             httpclient.getConnectionManager().shutdown();
@@ -135,8 +140,9 @@ public class LoadGeneratorBuilder extends Builder {
 
     }
 
-    private void generateLoad(PrintStream logger) {
-		logger.println("Generating load on " + url.toString());
+    private String generateLoad(BuildListener listener) throws Exception {
+    	PrintStream logger = listener.getLogger();
+    	logger.println("Generating load on " + url.toString());
         
         Config config = new Config();
         config.setSocketTimeout(1000);
@@ -145,11 +151,7 @@ public class LoadGeneratorBuilder extends Builder {
         config.setUrl(url);
         
         HttpBenchmark ab = new HttpBenchmark(config);
-        try {
-			logger.println(ab.execute());
-		} catch (Exception e) {
-			logger.println("Failed during load generation," + e.getMessage());
-		}
+        return ab.execute();
 	}
     
 

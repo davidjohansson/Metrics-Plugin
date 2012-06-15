@@ -2,10 +2,11 @@ package com.atex;
 
 import hudson.model.Action;
 import hudson.model.Run;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
+
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Abstract class with functionality common to all Metrics actions.
@@ -25,6 +26,6 @@ public class AbstractMetricsAction implements Action {
    }
    
    protected boolean shouldReloadGraph(StaplerRequest request, StaplerResponse response, Run build) throws IOException {
-	      return !request.checkIfModified(build.getTimestamp(), response);
-	   }
+      return !request.checkIfModified(build.getTimestamp(), response);
+   }
 }
