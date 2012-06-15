@@ -46,14 +46,15 @@ public class LoadGeneratorProjectAction implements Action {
 							Result.SUCCESS)) {
 				LoadGeneratorBuildAction action = abstractBuild
 						.getAction(LoadGeneratorBuildAction.class);
-
-				double timePerRequest = action.getTimePerRequest();
-				if(timePerRequest != -1) {
-					tprBuilder.add(timePerRequest, "Your site", new NumberOnlyBuildLabel(abstractBuild));
-				}
-				double requestPerSecond = action.getRequestPerSecond();
-				if(requestPerSecond != -1) {
-					rpsBuilder.add(requestPerSecond, "Your site", new NumberOnlyBuildLabel(abstractBuild));
+				if(action != null) {
+					double timePerRequest = action.getTimePerRequest();
+					if(timePerRequest != -1) {
+						tprBuilder.add(timePerRequest, "Your site", new NumberOnlyBuildLabel(abstractBuild));
+					}
+					double requestPerSecond = action.getRequestPerSecond();
+					if(requestPerSecond != -1) {
+						rpsBuilder.add(requestPerSecond, "Your site", new NumberOnlyBuildLabel(abstractBuild));
+					}
 				}
 			}
 		}

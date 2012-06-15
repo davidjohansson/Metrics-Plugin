@@ -11,8 +11,8 @@ public class LoadGeneratorBuildAction extends AbstractMetricsAction {
 	private String abResult;
 	private double timePerRequest;
 	private double requestsPerSecond;
-	private Pattern tprPattern = Pattern.compile(("Time per request:\\s\\s(\\d*\\.\\d*)"));
-	private Pattern rpsPattern = Pattern.compile(("Requests per second:\\s\\s(\\d*\\.\\d*)"));
+	private Pattern tprPattern = Pattern.compile(("Time per request:\\s\\s(\\d*[\\.,]\\d*)"));
+	private Pattern rpsPattern = Pattern.compile(("Requests per second:\\s\\s(\\d*[\\.,]\\d*)"));
 	
 	public LoadGeneratorBuildAction(String abResult) {
 		this.abResult = abResult;
