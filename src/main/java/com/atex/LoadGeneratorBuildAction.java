@@ -23,7 +23,7 @@ public class LoadGeneratorBuildAction extends AbstractMetricsAction {
 		try {
 			Matcher matcher = tprPattern.matcher(abResult);
 			matcher.find();
-			timePerRequest = Double.parseDouble(matcher.group(1));
+			timePerRequest = Double.parseDouble(matcher.group(1).replace(',', '.'));
 		}
 		catch(Exception e) {
 			LOG.log(Level.WARNING, "Failed to parse time per request from AB result", e);
@@ -32,7 +32,7 @@ public class LoadGeneratorBuildAction extends AbstractMetricsAction {
 		try {
 			Matcher matcher = rpsPattern.matcher(abResult);
 			matcher.find();
-			requestsPerSecond = Double.parseDouble(matcher.group(1));
+			requestsPerSecond = Double.parseDouble(matcher.group(1).replace(',', '.'));
 		}
 		catch(Exception e) {
 			LOG.log(Level.WARNING, "Failed to parse requests per second from AB result", e);
