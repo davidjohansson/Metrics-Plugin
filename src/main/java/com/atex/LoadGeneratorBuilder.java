@@ -19,8 +19,13 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.benchmark.Config;
 import org.apache.http.benchmark.HttpBenchmark;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -81,7 +86,7 @@ public class LoadGeneratorBuilder extends Builder {
         // This is where you 'build' the project.
         // Since this is a dummy, we just say 'hello world' and call that a build.
 
-        List<Cause> buildStepCause = new ArrayList();
+        List<Cause> buildStepCause = new ArrayList<Cause>();
         buildStepCause.add(new Cause() {
           public String getShortDescription() {
             return "Build Step started by the load generator";
@@ -92,25 +97,49 @@ public class LoadGeneratorBuilder extends Builder {
         PrintStream logger = listener.getLogger();
         
         if(clearMetrics) {
-        	clearMetricsData(logger);
+        	clearMetricsData(listener);
         }
         
         generateLoad(logger);
-
         listener.finished(Result.SUCCESS);
         
         return true;
     }
 
-    private void clearMetricsData(PrintStream logger) {
-    	
+    private void clearMetricsData(BuildListener listener) {
+        HttpClient httpclient = new DefaultHttpClient();
+        PrintStream logger = listener.getLogger();
+        try {
+        	String metricsURI = "http://localhost:8080/polopolydevelopment/Metrics";
+            HttpGet httpget = new HttpGet(metricsURI + "?mode=clear");
+
+            // Create a response handler
+            HttpResponse response = httpclient.execute(httpget);
+            if(response.getStatusLine().getStatusCode() == 200) {
+            	logger.println("Cleared all metrics data");
+            }
+            else {
+            	logger.println("Failed to clear metrics data, got response code " + response.getStatusLine().getStatusCode());
+            	listener.finished(Result.FAILURE);
+            }
+
+        } catch (ClientProtocolException e) {
+        	logger.println("Failed to clear metrics data, " + e.getMessage());
+        	listener.finished(Result.FAILURE);
+		} catch (IOException e) {
+			logger.println("Failed to clear metrics data, " + e.getMessage());
+			listener.finished(Result.FAILURE);
+		} finally {
+            httpclient.getConnectionManager().shutdown();
+        }
+
     }
 
     private void generateLoad(PrintStream logger) {
 		logger.println("Generating load on " + url.toString());
         
         Config config = new Config();
-        config.setKeepAlive(true);
+        config.setSocketTimeout(1000);
         config.setRequests(requests);
         config.setThreads(threads);
         config.setUrl(url);
