@@ -10,7 +10,11 @@ import hudson.util.ShiftedCategoryAxis;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -32,6 +36,16 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 
 	private final Project<?, ?> project;
 
+	private DataSetBuilder<String, NumberOnlyBuildLabel> combinedGraphBuilder;
+	private TreeMap<String, DataSetBuilder<String, NumberOnlyBuildLabel>> individualGraphBuilders;
+	
+	
+	public List<String> getIndividualGraphBuilders(){
+		List<String> list = new ArrayList<String>(individualGraphBuilders.keySet());
+		Collections.sort(list);
+		return list;
+	}
+
 	public MetricsProjectAction(Project<?, ?> project) {
 		this.project = project;
 	}
@@ -40,18 +54,11 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 		return project;
 	}
 
-	public void doMetricsAccumulatedGraph(StaplerRequest request,
-			StaplerResponse response) throws IOException {
+	
+	public void init()  {
+		combinedGraphBuilder = new DataSetBuilder<String, NumberOnlyBuildLabel>();
 
-		if (shouldReloadGraph(request, response)) {
-			ChartUtil.generateGraph(request, response,
-					createNumberBuildGraph(), 1200, 600);
-		}
-	}
-		
-	private JFreeChart createNumberBuildGraph() {
-	      DataSetBuilder<String, NumberOnlyBuildLabel> builder = new DataSetBuilder<String, NumberOnlyBuildLabel>();
-		
+		individualGraphBuilders = new TreeMap<String, DataSetBuilder<String, NumberOnlyBuildLabel>>();
 
 		for (Object build : project.getBuilds()) {
 
@@ -64,15 +71,60 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 						.getAction(MetricsBuildAction.class);
 
 				Iterator<MetricsData> i = action.getMetricsList().iterator();
-				while(i.hasNext())
-				{
+				while (i.hasNext()) {
 					MetricsData data = i.next();
-					builder.add(new Integer(data.getTotalTime()), data.getKey(), new NumberOnlyBuildLabel(abstractBuild));
+					DataSetBuilder<String, NumberOnlyBuildLabel> individualGraphBuilder = individualGraphBuilders
+							.get(data.getKey());
+					if (individualGraphBuilder == null) {
+						individualGraphBuilder = new DataSetBuilder<String, NumberOnlyBuildLabel>();
+						individualGraphBuilders.put(data.getKey(),
+								individualGraphBuilder);
+					}
+
+					addDataToBuilder(combinedGraphBuilder, data, abstractBuild);
+					addDataToBuilder(individualGraphBuilder, data,
+							abstractBuild);
 				}
 			}
 		}
+	}
 
-		JFreeChart chart = ChartFactory.createLineChart("", "Build", "Rendering time (ms)", builder.build(),
+	
+	public void doMetricsIndividualGraph(StaplerRequest request,
+			StaplerResponse response) throws IOException {
+		String key = request.getParameter("key");
+		DataSetBuilder<String, NumberOnlyBuildLabel> builder = individualGraphBuilders.get(key);
+		if(builder != null){
+			ChartUtil.generateGraph(request, response,
+					createMetricsGraph(builder), 800, 400);
+		}
+	}
+	
+	
+	public void doMetricsAccumulatedGraph(StaplerRequest request,
+			StaplerResponse response) throws IOException {
+		
+		if (shouldReloadGraph(request, response)) {
+
+		
+			//Draw the common graph:
+			ChartUtil.generateGraph(request, response,
+					createMetricsGraph(combinedGraphBuilder), 1200, 600);
+	
+		}
+	}
+
+	private void addDataToBuilder(DataSetBuilder<String, NumberOnlyBuildLabel> builder, MetricsData data,
+			AbstractBuild build) {
+		builder.add(new Integer(data.getTotalTime()), data.getKey(),
+				new NumberOnlyBuildLabel(build));
+	}
+
+
+	private JFreeChart createMetricsGraph(
+			DataSetBuilder<String, NumberOnlyBuildLabel> graphBuilder) {
+		JFreeChart chart = ChartFactory.createLineChart("", "Build",
+				"Rendering time (ms)", graphBuilder.build(),
 				PlotOrientation.VERTICAL, true, true, true);
 
 		chart.setBackgroundPaint(Color.WHITE);
@@ -102,8 +154,9 @@ public class MetricsProjectAction extends AbstractMetricsAction {
 
 	private boolean shouldReloadGraph(StaplerRequest request,
 			StaplerResponse response) throws IOException {
-		return shouldReloadGraph(request, response,
-				project.getLastSuccessfulBuild());
+		return true;
+		//		return shouldReloadGraph(request, response,
+				//project.getLastSuccessfulBuild());
 	}
 
 }
