@@ -153,42 +153,18 @@ public class LoadGeneratorBuilder extends Builder {
          */
         public FormValidation doCheckUrl(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() == 0) {
-            	return FormValidation.error("Please set a URL");
-            }
-            try {
-        		new URL(value);
-        		return FormValidation.ok();
-        	}
-        	catch(MalformedURLException e) {
-        		return FormValidation.error("Malformed URL, " + e.getMessage());
-        	}
+			return ValidationUtil.checkUrl(value);
+
         }
         
         public FormValidation doCheckThreads(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() > 0) {
-            	try {
-            		Integer.parseInt(value);
-            	}
-            	catch(NumberFormatException e) {
-            		return FormValidation.error("Please enter a valid integer value, " + e.getMessage());
-            	}
-            }
-            return FormValidation.ok();
+            return ValidationUtil.checkIntValue(value);
         }
-        
+
         public FormValidation doCheckRequests(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() > 0) {
-            	try {
-            		Integer.parseInt(value);
-            	}
-            	catch(NumberFormatException e) {
-            		return FormValidation.error("Please enter a valid integer value, " + e.getMessage());
-            	}
-            }
-            return FormValidation.ok();
+            return ValidationUtil.checkIntValue(value);
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
